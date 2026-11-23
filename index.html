@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#091426">
+<title>Vier Gewinnt PRO – App</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Vier Gewinnt PRO">
+<meta name="mobile-web-app-capable" content="yes">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="64x64" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<style>
+  :root { color-scheme:dark; --bg:#091426;--panel:#15263e;--border:#304767;--pink:#f75c76;--gold:#f4bd43;--text:#f8fafc;--sub:#a9bad4; }
+  *{box-sizing:border-box}
+  body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 50% -20%,#1c3a6a 0,transparent 65%),var(--bg);color:var(--text);font:500 15px system-ui,-apple-system,"Segoe UI",sans-serif;padding:env(safe-area-inset-top) max(12px,env(safe-area-inset-right)) env(safe-area-inset-bottom) max(12px,env(safe-area-inset-left));}
+  main{width:min(100%,860px);margin:0 auto;padding:14px 0 22px;}
+  header{text-align:center}
+  h1{letter-spacing:.055em;font-size:clamp(29px,6.4vw,43px);margin:0;line-height:1.2}
+  .subtitle{color:#91aacc;font-size:11px;letter-spacing:.12em;font-weight:800;margin-top:4px}
+  .scoreboard{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px auto 12px;max-width:600px}
+  .score{background:linear-gradient(145deg,#1c3552,#14243c);border:1px solid var(--border);border-radius:15px;padding:11px;text-align:center;box-shadow:0 5px 13px #0002}
+  .score b{display:block;font-size:12px;letter-spacing:.09em}
+  .score strong{display:block;font-size:24px;color:white;line-height:1.35}
+  .red{color:var(--pink)}.yellow{color:var(--gold)}
+  #status{text-align:center;font-size:clamp(15px,3.4vw,18px);font-weight:850;color:var(--pink);min-height:26px}
+  #info{text-align:center;color:var(--sub);font-size:clamp(11px,2.6vw,13px);min-height:25px;padding:0 8px;line-height:1.5}
+  .game{width:100%;max-width:760px;margin:10px auto 0}
+  .columns{display:grid;grid-template-columns:repeat(7,1fr);padding:0 10px;margin-bottom:3px;gap:0}
+  .columns button{color:#8fb2ec;border:0;background:transparent;min-height:30px;font:700 14px system-ui;cursor:pointer;border-radius:6px;touch-action:manipulation}
+  .columns button:active{background:#315ba4;color:white}
+  #board{width:100%;height:auto;display:block;touch-action:manipulation;cursor:pointer;user-select:none;-webkit-user-select:none;border-radius:14px;filter:drop-shadow(0px 12px 15px #0008)}
+  .controls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:18px 0 12px}
+  button.action{border:0;border-radius:11px;padding:12px 16px;font:750 14px system-ui;color:white;cursor:pointer;background:#2563eb;box-shadow:0 3px 0 #163f9b;touch-action:manipulation}
+  button.action.alt{background:#304767;box-shadow:0 3px 0 #15243b}
+  button.action:active{transform:translateY(2px);box-shadow:none}
+  .settings{display:flex;align-items:center;justify-content:center;gap:10px;color:#bdcde1;font-size:13px;margin:10px 0;flex-wrap:wrap}
+  select{background:#213957;color:white;border:1px solid var(--border);border-radius:8px;padding:9px 11px;font:600 13px system-ui}
+  footer{text-align:center;color:#8298b6;font-size:11px;max-width:690px;margin:18px auto 0;line-height:1.5}
+  @media(min-width:640px){main{padding-top:24px}.scoreboard{margin-top:19px}.game{margin-top:17px}}
+  @media(max-width:350px){body{padding-left:7px;padding-right:7px}.score{padding:8px}.controls{gap:6px}button.action{padding:11px 10px;font-size:12px}}
+  @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+</style>
+</head>
+<body>
+<main>
+<header><h1>VIER GEWINNT</h1><div class="subtitle">PRO EDITION · APP</div></header>
+<section class="scoreboard" aria-label="Punktestand">
+  <div class="score"><b class="red">● DU</b><strong id="humanScore">0</strong><span>Siege</span></div>
+  <div class="score"><b class="yellow">● COMPUTER</b><strong id="aiScore">0</strong><span>Siege</span></div>
+</section>
+<div id="status" aria-live="polite">● Du bist am Zug</div>
+<div id="info">Mathematisch geprüftes Eröffnungsbuch · starke Suche</div>
+<section class="game" aria-label="Vier-Gewinnt-Spielfeld">
+  <div class="columns" id="colButtons"></div>
+  <canvas id="board" width="728" height="628" role="button" tabindex="0" aria-label="Spielfeld mit sieben Spalten, durch Berühren einen Stein einwerfen"></canvas>
+</section>
+<div class="controls">
+  <button class="action" id="newGame">Neue Runde</button>
+  <button class="action alt" id="resetScore">Punkte zurücksetzen</button>
+</div>
+<div class="settings"><label for="thinkTime">Maximale KI-Denkzeit:</label><select id="thinkTime"><option value="2">2 Sekunden</option><option value="5">5 Sekunden</option><option value="10">10 Sekunden</option><option value="20" selected>20 Sekunden</option></select></div>
+<footer>Originalformat 7 × 6 · Touch-Steuerung · funktioniert offline als PWA. Bei starkem Computergegner kann die Suche je nach Smartphone einige Sekunden benötigen.</footer>
+<div class="settings" style="margin-top:2px"><span>Installation: iPhone/iPad über <b>Safari → Teilen → Zum Home-Bildschirm</b>, Android über <b>Installieren / Zum Startbildschirm hinzufügen</b>.</span></div>
+</main>
+<script>
+'use strict';
+// Exakte Eröffnungsantworten, minimax-abgeleitet aus:
+// BitBully 8-ply opening database, Markus Thill (MIT-Lizenz).
+// Quellen und Lizenzhinweise in VIER_GEWINNT_LIZENZEN.txt im ZIP.
+const OPENING_DATA = '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';
+const OPENINGS = (() => {
+  const ans = new Uint8Array(7+343+16807).fill(3);
+  const data=atob(OPENING_DATA);let idx=-1,val=0,shift=0;
+  for(let i=0;i<data.length;i++){
+    let b=data.charCodeAt(i);val+=(b&127)*2**shift;
+    if(b&128)shift+=7;
+    else {idx+=Math.floor(val/8);if(idx<0||idx>=ans.length||val%8>6)throw Error('Buchdaten beschädigt');ans[idx]=val%8;val=0;shift=0;}
+  }
+  return ans;
+})();
+function bookMove(hist){
+  const offsets={1:0,3:7,5:350}, n=hist.length;
+  if(!(n in offsets))return null;
+  let idx=0;for(const c of hist)idx=idx*7+c;
+  return OPENINGS[offsets[n]+idx];
+}
+const C=100, PAD=14, TOP=14, W=728, H=628;
+const RED='#f75c76',GOLD='#f4bd43';
+const board=document.getElementById('board'),ctx=board.getContext('2d');
+const stat=document.getElementById('status'),info=document.getElementById('info');
+const score1=document.getElementById('humanScore'),score2=document.getElementById('aiScore');
+let grid=[],history=[],points=[0,0,0],turn=1,finished=false,falling=null,hover=null,round=0,worker=null,animFrame=null,thinkingTimer=null;
+function setStatus(t,color=RED){stat.textContent=t;stat.style.color=color;}
+function setInfo(t){info.textContent=t;}
+function rounded(x,y,w,h,r){ctx.beginPath();ctx.roundRect(x,y,w,h,r);}
+function noise(x,y){let n=((x*374761393+y*668265263+0x9e3779b9)>>>0);n=Math.imul(n^(n>>>13),1274126177)>>>0;return (((n^(n>>>16))&255)-127)/127;}
+const tile=document.createElement('canvas');tile.width=tile.height=128;
+const tc=tile.getContext('2d');let img=tc.createImageData(128,128);
+for(let y=0;y<128;y++)for(let x=0;x<128;x++){
+  const i=4*(y*128+x),v=noise(x,y)*5+noise(x>>2,y>>2)*2;
+  img.data[i]=36+v;img.data[i+1]=102+v;img.data[i+2]=202+v;img.data[i+3]=255;
+}
+tc.putImageData(img,0,0);const plastic=ctx.createPattern(tile,'repeat');
+function coin(x,y,p,r,winning=false){
+  // Münze: Wulstrand, feine Rändelung und eingeprägte Vier.
+  ctx.save();ctx.shadowColor='#071226';ctx.shadowBlur=6;ctx.shadowOffsetY=3;
+  const base=p===1?[247,92,118]:[244,189,67];
+  let g=ctx.createRadialGradient(x-r*.35,y-r*.42,r*.06,x,y,r);
+  let high=base.map(v=>Math.min(255,v+35));
+  const rgb=a=>'rgb('+a.join(',')+')';
+  g.addColorStop(0,rgb(high));g.addColorStop(.60,rgb(base));g.addColorStop(1,rgb(base.map(v=>Math.round(v*.70))));
+  ctx.beginPath();ctx.arc(x,y,r,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+  ctx.shadowBlur=ctx.shadowOffsetY=0;
+  ctx.strokeStyle='rgba(255,255,255,.32)';ctx.lineWidth=1.3;ctx.stroke();
+  ctx.beginPath();ctx.arc(x,y,r-5,0,Math.PI*2);ctx.strokeStyle='rgba(20,31,46,.38)';ctx.lineWidth=5;ctx.stroke();
+  ctx.beginPath();ctx.arc(x,y,r-9,0,Math.PI*2);ctx.strokeStyle='rgba(255,252,244,.58)';ctx.lineWidth=1.5;ctx.stroke();
+  // Feine Prägestriche am Rand.
+  ctx.lineWidth=.75;ctx.strokeStyle='rgba(10,20,35,.24)';
+  for(let i=0;i<64;i++){
+    let a=i*Math.PI*2/64;ctx.beginPath();ctx.moveTo(x+Math.cos(a)*(r-3),y+Math.sin(a)*(r-3));ctx.lineTo(x+Math.cos(a)*(r-5.5),y+Math.sin(a)*(r-5.5));ctx.stroke();
+  }
+  ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='900 46px system-ui, sans-serif';
+  ctx.fillStyle='rgba(255,255,255,.23)';ctx.fillText('4',x-1,y-2);
+  ctx.fillStyle='rgba(30,40,52,.34)';ctx.fillText('4',x+1,y+1);
+  if(winning){ctx.beginPath();ctx.arc(x,y,r+3.5,0,Math.PI*2);ctx.strokeStyle='#fff';ctx.shadowColor='#fff';ctx.shadowBlur=11;ctx.lineWidth=4;ctx.stroke();}
+  ctx.restore();
+}
+function render(){
+  ctx.clearRect(0,0,W,H);
+  ctx.save();ctx.shadowColor='#0009';ctx.shadowBlur=17;ctx.shadowOffsetY=8;
+  rounded(4,4,W-8,H-8,13);ctx.fillStyle='#1a457c';ctx.fill();ctx.restore();
+  ctx.save();rounded(7,6,W-14,H-16,10);ctx.clip();ctx.fillStyle=plastic;ctx.fillRect(0,0,W,H);
+  let bevel=ctx.createLinearGradient(0,0,0,H);bevel.addColorStop(0,'rgba(255,255,255,.07)');bevel.addColorStop(1,'rgba(0,8,30,.21)');ctx.fillStyle=bevel;ctx.fillRect(0,0,W,H);
+  for(let z=0;z<6;z++)for(let s=0;s<7;s++){
+    const x=PAD+C*(s+.5),y=TOP+C*(z+.5);
+    let g=ctx.createRadialGradient(x,y-2,7,x,y,C*.43);
+    g.addColorStop(0,'#0b1a33');g.addColorStop(.84,'#0a1b37');g.addColorStop(.97,'#173c71');g.addColorStop(1,'#85b3fa');
+    ctx.beginPath();ctx.arc(x,y,C*.43,0,Math.PI*2);ctx.fillStyle=g;ctx.fill();
+    ctx.strokeStyle='rgba(138,193,255,.7)';ctx.lineWidth=1.5;ctx.stroke();
+    if(grid[z][s])coin(x,y,grid[z][s],C*.392,winners.has(z+':'+s));
+  }
+  ctx.restore();
+  if(falling)coin(PAD+C*(falling.col+.5),falling.y,falling.p,C*.392);
+  else if(!finished && turn===1 && hover!==null){ctx.beginPath();ctx.arc(PAD+C*(hover+.5),C*.12,C*.115,0,Math.PI*2);ctx.fillStyle=RED;ctx.fill();}
+}
+let winners=new Set();
+function winningLine(z,s,p){
+  for(const [dz,ds] of [[0,1],[1,0],[1,1],[1,-1]]){
+    const line=[[z,s]];
+    for(const sign of [-1,1]){
+      let r=z+dz*sign,c=s+ds*sign;
+      while(r>=0&&r<6&&c>=0&&c<7&&grid[r][c]===p){line.push([r,c]);r+=dz*sign;c+=ds*sign;}
+    }
+    if(line.length>=4)return line;
+  }
+  return [];
+}
+function newGame(clearScores=false){
+  round++;if(worker){worker.terminate();worker=null;}
+  if(animFrame!==null){cancelAnimationFrame(animFrame);animFrame=null;}
+  if(thinkingTimer!==null){clearTimeout(thinkingTimer);thinkingTimer=null;}
+  if(clearScores){points=[0,0,0];score1.textContent='0';score2.textContent='0';}
+  grid=Array.from({length:6},()=>Array(7).fill(0));history=[];turn=1;finished=false;falling=null;hover=null;winners=new Set();
+  setStatus('● Du bist am Zug');setInfo('Eröffnungsbuch · exakte Endspielsuche · 7 × 6');render();
+}
+function drop(col,p){
+  if(finished||falling||p!==turn||col<0||col>6)return;
+  let row=-1;for(let z=5;z>=0;z--)if(!grid[z][col]){row=z;break;}
+  if(row<0)return;
+  let y=TOP+C*.5*(.1),target=TOP+C*(row+.5),last=performance.now();
+  falling={col,p,y};hover=null;
+  function frame(now){
+    const dt=Math.min(40,now-last);last=now;
+    y=Math.min(target,y+dt*1.7);falling.y=y;render();
+    if(y<target)animFrame=requestAnimationFrame(frame);
+    else {animFrame=null;falling=null;grid[row][col]=p;history.push(col);afterMove(row,col,p);render();}
+  }
+  animFrame=requestAnimationFrame(frame);
+}
+function afterMove(z,s,p){
+  const win=winningLine(z,s,p);
+  if(win.length){winners=new Set(win.map(([a,b])=>a+':'+b));finished=true;points[p]++;score1.textContent=points[1];score2.textContent=points[2];setStatus(p===1?'★ Du hast gewonnen!':'★ Der Computer gewinnt!',p===1?RED:GOLD);return;}
+  if(grid[0].every(x=>x)){finished=true;setStatus('Unentschieden!','#fff');return;}
+  if(p===1){turn=2;setStatus('● Computer denkt …',GOLD);const id=round;thinkingTimer=setTimeout(()=>{thinkingTimer=null;if(id===round)aiMove();},290);}
+  else {turn=1;setStatus('● Du bist am Zug');}
+}
+function aiMove(){
+  if(turn!==2||finished)return;
+  const col=bookMove(history);
+  if(col!==null && !grid[0][col]){setInfo('Geprüftes Eröffnungsbuch · mathematisch ausgewertete Antwort');drop(col,2);return;}
+  setInfo('Analyse läuft …');
+  const serial=round;
+  const seconds=Number(document.getElementById('thinkTime').value);
+  try{
+    const code='('+aiWorker.toString()+')()';
+    const blob=new Blob([code],{type:'text/javascript'});
+    const url=URL.createObjectURL(blob);
+    worker=new Worker(url);URL.revokeObjectURL(url);
+    worker.onmessage=e=>{
+      if(serial!==round||finished||turn!==2)return;
+      const d=e.data;
+      if(d.kind==='progress'){setInfo('Tiefe '+d.depth+' · '+d.nodes.toLocaleString('de-DE')+' Knoten');}
+      else if(d.kind==='done'){
+        if(worker){worker.terminate();worker=null;}
+        setInfo((d.solved?'Stellung vollständig gelöst':'Suche bis Tiefe '+d.depth)+' · '+d.nodes.toLocaleString('de-DE')+' Knoten');
+        drop(d.col,2);
+      }
+      else if(d.kind==='error'){setInfo('Berechnungsfehler: '+String(d.message).slice(0,70));if(worker){worker.terminate();worker=null;}drop(legalCenter(),2);}
+    };
+    worker.onerror=e=>{if(serial!==round)return;setInfo('Browser blockiert den KI-Worker – Fallback-Zug');if(worker){worker.terminate();worker=null;}drop(legalCenter(),2);};
+    worker.postMessage({history:history.slice(),seconds});
+  }catch(err){setInfo('KI-Worker nicht verfügbar: begrenzte Strategie');drop(legalCenter(),2);}
+}
+function legalCenter(){for(const c of [3,2,4,1,5,0,6])if(!grid[0][c])return c;return 3;}
+function tap(col){if(turn===1&&!finished&&!falling)drop(col,1);}
+board.addEventListener('pointerdown',e=>{const rect=board.getBoundingClientRect();const x=(e.clientX-rect.left)/rect.width*W;tap(Math.floor((x-PAD)/C));});
+board.addEventListener('keydown',e=>{if('1234567'.includes(e.key) && e.key){tap(Number(e.key)-1);e.preventDefault();}});
+document.addEventListener('keydown',e=>{if(e.target.matches('select,button'))return;if(e.key&&'1234567'.includes(e.key))tap(Number(e.key)-1);if(e.key.toLowerCase()==='r')newGame();});
+for(let c=0;c<7;c++){const b=document.createElement('button');b.textContent=c+1;b.setAttribute('aria-label','Spalte '+(c+1));b.addEventListener('click',()=>tap(c));document.getElementById('colButtons').appendChild(b);}
+document.getElementById('newGame').addEventListener('click',()=>newGame());
+document.getElementById('resetScore').addEventListener('click',()=>newGame(true));
+
+// Die KI läuft im eigenen Worker – keine blockierte Touch-Oberfläche.
+function aiWorker(){
+ 'use strict';
+ const ORD=[3,2,4,1,5,0,6],MAX=42,MINUS=-2000000,PLUS=2000000,MATE=1000000;
+ const BOTTOM=Array.from({length:7},(_,i)=>1n<<BigInt(7*i));
+ const COLS=BOTTOM.map(b=>63n*b),BOTTOM_ALL=BOTTOM.reduce((a,b)=>a|b,0n),FULL=COLS.reduce((a,b)=>a|b,0n);
+ const FOURS=[];
+ for(let c=0;c<7;c++)for(let r=0;r<6;r++)for(const [dc,dr] of [[1,0],[0,1],[1,1],[1,-1]]){
+  if(c+3*dc>=0 && c+3*dc<7 && r+3*dr>=0 && r+3*dr<6){let b=0n;for(let k=0;k<4;k++)b|=1n<<BigInt((c+k*dc)*7+(r+k*dr));FOURS.push(b);}
+ }
+ function win(bits){for(const d of [1n,7n,6n,8n]){const m=bits&(bits>>d);if(m&(m>>(2n*d)))return true;}return false;}
+ function count(b){let n=0;while(b){b&=b-1n;n++;}return n;}
+ function wins(bits,mask){let r=(bits<<1n)&(bits<<2n)&(bits<<3n);for(const d of [7n,6n,8n]){
+  let p=(bits<<d)&(bits<<(2n*d));r|=p&(bits<<(3n*d));r|=p&(bits>>d);
+  p=(bits>>d)&(bits>>(2n*d));r|=p&(bits<<d);r|=p&(bits>>(3n*d));
+ }return r&(FULL^mask);}
+ function possible(mask){return(mask+BOTTOM_ALL)&FULL;}
+ function bitmove(mask,col){return(mask+BOTTOM[col])&COLS[col];}
+ function nonlosing(cur,mask,play,oppwin){const forced=play&oppwin;if(forced){if(forced&(forced-1n))return 0n;play=forced;}return play&~(oppwin>>1n);}
+ let deadline=0,nodes=0,tt=null;
+ function check(){nodes++;if((nodes&127)===0 && performance.now()>=deadline)throw Error('timeout');}
+ function evaluate(cur,mask){const opp=mask^cur;let score=0;
+  for(const w of FOURS){const a=cur&w,b=opp&w;if(a && !b)score+=[0,2,13,65,0][count(a)];else if(b && !a)score-=[0,2,13,65,0][count(b)];}
+  score+=4*(count(cur&COLS[3])-count(opp&COLS[3]));
+  const play=possible(mask),mc=wins(cur,mask),mo=wins(opp,mask);
+  score+=12*(count(mc)-count(mo))+100*(count(play&mc)-count(play&mo));return score;
+ }
+ function ordered(moves,cur,mask,hint){let list=[];
+  for(const col of ORD){const bit=bitmove(mask,col);if(!(bit&moves))continue;
+   const future=count(wins(cur|bit,mask|bit));let pri=6-Math.abs(3-col)+12*future+(col===hint?1000:0);
+   list.push({col,bit,pri});}
+  list.sort((a,b)=>b.pri-a.pri);return list;
+ }
+ function negamax(cur,mask,depth,alpha,beta){check();const n=count(mask),play=possible(mask);if(!play)return 0;
+  if(play&wins(cur,mask))return MATE-(n+1);
+  let moves=nonlosing(cur,mask,play,wins(mask^cur,mask));if(!moves)return-MATE+(n+2);
+  if(depth<=0)return evaluate(cur,mask);
+  const key=cur.toString()+':'+mask.toString(),entry=tt.get(key);
+  let hint=-1;if(entry){hint=entry.col;if(entry.depth>=depth){if(entry.flag===0)return entry.score;
+   if(entry.flag===1)alpha=Math.max(alpha,entry.score);else beta=Math.min(beta,entry.score);
+   if(alpha>=beta)return entry.score;}}
+  const origA=alpha,origB=beta;let best=MINUS,bestCol=-1;
+  for(const {col,bit} of ordered(moves,cur,mask,hint)){
+   const val=-negamax(cur^mask,mask|bit,depth-1,-beta,-alpha);
+   if(val>best){best=val;bestCol=col;}
+   alpha=Math.max(alpha,val);if(alpha>=beta)break;
+  }
+  if(tt.size>40000)tt.clear();tt.set(key,{depth,score:best,col:bestCol,flag:best<=origA?2:best>=origB?1:0});
+  return best;
+ }
+ function root(cur,mask,depth,hint){const n=count(mask),play=possible(mask),winSquares=play&wins(cur,mask);
+  if(winSquares){for(const c of ORD)if(bitmove(mask,c)&winSquares)return[c,MATE-n-1];}
+  let moves=nonlosing(cur,mask,play,wins(mask^cur,mask));if(!moves)moves=play;
+  const orderedMoves=ordered(moves,cur,mask,hint);if(!orderedMoves.length)return[null,0];
+  let best=MINUS,bestC=orderedMoves[0].col,alpha=MINUS,beta=PLUS;
+  for(const {col,bit} of orderedMoves){check();const score=-negamax(cur^mask,mask|bit,depth-1,-beta,-alpha);
+   if(score>best){best=score;bestC=col;}alpha=Math.max(alpha,score);
+  }return[bestC,best];
+ }
+ function choose(history,seconds){tt=new Map();nodes=0;deadline=performance.now()+seconds*1000;
+  let p2=0n,mask=0n,heights=Array(7).fill(0);
+  for(let i=0;i<history.length;i++){const col=history[i];const bit=1n<<BigInt(col*7+heights[col]++);mask|=bit;if(i%2)p2|=bit;}
+  const cur=p2,play=possible(mask),n=history.length;
+  if(!play)return{kind:'done',col:null,depth:0,nodes,solved:true};
+  const winsNow=play&wins(cur,mask);
+  if(winsNow){for(const c of ORD)if(bitmove(mask,c)&winsNow)return{kind:'done',col:c,depth:0,nodes,solved:true};}
+  const moves=nonlosing(cur,mask,play,wins(mask^cur,mask));
+  let best=ORD.find(c=>bitmove(mask,c)&(moves||play)),bestScore=0,depthDone=0,solved=false;
+  const limit=Math.min(32,MAX-n);
+  for(let d=1;d<=limit;d++){
+   try{const [col,val]=root(cur,mask,d,best);best=col;bestScore=val;depthDone=d;self.postMessage({kind:'progress',depth:d,nodes});
+    if(Math.abs(val)>=MATE-42 || d>=MAX-n){solved=true;break;}}
+   catch(e){if(String(e.message)==='timeout')break;throw e;}
+  }
+  return{kind:'done',col:best,depth:depthDone,nodes,solved};
+ }
+ self.onmessage=e=>{
+   try{self.postMessage(choose(e.data.history,e.data.seconds));}
+   catch(err){self.postMessage({kind:'error',message:String(err.message||err)});}
+ };
+}
+newGame();
+</script>
+<script>
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW fehlgeschlagen:", err));
+  });
+}
+</script>
+</body>
+</html>
