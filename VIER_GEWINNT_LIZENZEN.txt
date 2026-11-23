@@ -1,0 +1,12 @@
+Drittquellen-Hinweis
+=================
+Das vorbereitete Spiel nennt in einem Quellcode-Kommentar ein mathematisch
+ausgewertetes Eröffnungsbuch, das auf der "BitBully 8-ply opening database"
+von Markus Thill basiert (laut Paketvorlage MIT-Lizenz).
+
+Die Datei enthält keine Garantie für perfekte Spielstärke. Eine vollständige
+Prüfung der Datenherkunft und ihrer Lizenzhinweise steht noch aus.
+Bitte die Originalquelle und den vollständigen Lizenztext vor weiterer
+Weiterverbreitung des Eröffnungsbuchs abgleichen.
+
+Für das eigene Spiel wurde bisher keine allgemeine Open-Source-Lizenz erteilt.
