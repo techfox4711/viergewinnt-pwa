@@ -1,91 +1,81 @@
 # Vier gewinnt PRO
 
-Eine browserbasierte Version des klassischen **Vier gewinnt** als Progressive Web App (PWA) für Smartphones, Tablets und Desktop-Computer.
+**Installierbares Vier-Gewinnt-Spiel für Smartphone und Desktop** – ein Mensch spielt gegen einen starken Computergegner. Die Anwendung ist als Progressive Web App (PWA) für Android, iPhone, iPad, Linux und Windows umgesetzt.
 
-> **Projektstatus:** Das Repository befindet sich im Aufbau. Die Anwendung ist erst spielbar und installierbar, sobald die Programmdateien hochgeladen und GitHub Pages eingerichtet wurden.
+## Aktueller Stand
 
-## Spielkonzept
+Die **Spieldateien sind im Repository vorhanden**. Das Spiel kann nach dem Öffnen von `index.html` direkt im Browser gespielt werden. Für den zuverlässigen PWA-/Offline-Betrieb ist eine Veröffentlichung über HTTPS (beispielsweise GitHub Pages) nötig.
 
-- **Ein Mensch spielt gegen den Computer.**
-- Klassisches Spielfeld mit **7 Spalten und 6 Reihen**.
-- Ziel: Vier eigene Spielsteine waagerecht, senkrecht oder diagonal verbinden.
-- Benutzerfreundliche Oberfläche mit deutlicher Hervorhebung einer Gewinnreihe.
-- Anpassung an Maus, Touchscreen sowie unterschiedliche Bildschirmgrößen.
-- Geplant ist ein besonders starker Computergegner mit effizienter Spielbaumsuche.
+**Wichtig:** Die Veröffentlichung über GitHub Pages ist damit noch **nicht automatisch aktiviert**. Die GitHub-Pages-Adresse darf erst als erreichbar gelten, wenn unter *Settings → Pages* eine erfolgreiche Bereitstellung angezeigt wird.
 
-## Geplante Funktionen
+## Spielfunktionen
 
-| Bereich | Ziel |
-| --- | --- |
-| Spielmodus | Mensch gegen Computer |
-| Spielfeld | 7 Spalten × 6 Reihen (klassische Regeln) |
-| Gegner | Starke KI, z. B. Minimax mit Alpha-Beta-Suche, Zugreihenfolge und Positionsbewertung |
-| Grafik | Flüssige Darstellung und gut erkennbare Gewinnmarkierung |
-| Plattformen | Browser auf Windows, Linux, Android und iOS |
-| Installation | PWA zum Starten vom Homescreen |
-| Offline-Modus | Nutzung ohne Internet nach erfolgreicher Installation und Zwischenspeicherung |
+- Klassisches Raster mit **7 Spalten × 6 Reihen** und vollständigen Vier-gewinnt-Regeln
+- **Mensch gegen Computer**, kein zweiter menschlicher Spieler erforderlich
+- Computergegner mit Eröffnungsbuch sowie zeitbegrenzter Spielbaumsuche (iterative Vertiefung, Negamax, Alpha-Beta-Suche und Stellungstabelle)
+- Einstellbare maximale Denkzeit: **2, 5, 10 oder 20 Sekunden**
+- Animation der fallenden Spielsteine und deutliche Markierung der Gewinnlinie
+- Sieg- und Rundenzähler, neue Runde und Rücksetzen des Punktestands
+- Touchbedienung, sieben Spalten-Schaltflächen und Tastatureingaben
+- Responsives Layout und separate KI-Berechnung im Web Worker, damit die Oberfläche bedienbar bleibt
+- PWA-Manifest, App-Symbole und Service Worker zur Offline-Nutzung nach dem ersten erfolgreichen Laden
 
-Die tatsächliche Umsetzung der genannten Funktionen wird bei der Integration des Spielcodes und in den Tests überprüft.
+**Spielstärke:** Die KI versucht, sehr starke Züge zu finden; wegen der zeitbegrenzten Suche ist **nicht jeder Zug garantiert mathematisch optimal**.
 
-## Vorgesehene Projektstruktur
+## Projektdateien
 
 ```text
 viergewinnt-pwa/
 ├── README.md
+├── README_PWA.txt
+├── VIER_GEWINNT_LIZENZEN.txt
 ├── index.html
 ├── manifest.webmanifest
 ├── sw.js
 └── icons/
+    ├── favicon-64.png
+    ├── apple-touch-icon.png
     ├── icon-192.png
     └── icon-512.png
 ```
 
-Die Verzeichnisstruktur ist ein Zielzustand, **keine Bestätigung bereits vorhandener Dateien**. Ergänzende HTML-, CSS-, JavaScript- und Testdateien können bei Bedarf hinzukommen.
+## Lokal ausprobieren
 
-## Lokal starten
+Zum Testen reicht ein lokaler HTTP-Server im Repositoryverzeichnis, z. B. mit Python:
 
-Nach dem Hochladen der Programmdateien kann `index.html` in einem Browser geöffnet werden. Für einen vollständigen Test der PWA, insbesondere des Service Workers, empfiehlt sich ein lokaler Entwicklungsserver oder eine HTTPS-Veröffentlichung. Der Offline-Modus funktioniert nicht zuverlässig beim direkten Öffnen über `file://`.
+```bash
+python -m http.server 8000
+```
 
-## Veröffentlichung über GitHub Pages
+Danach im Browser **http://localhost:8000/** öffnen. Alternativ ist die normale Spielseite ohne PWA-Funktionen häufig auch direkt über `index.html` startbar. Service Worker funktionieren beim direkten Öffnen über `file://` in der Regel nicht.
 
-1. Alle notwendigen Anwendungsdateien in das Repository übertragen.
-2. Auf GitHub **Settings → Pages** öffnen.
-3. Unter **Build and deployment** die Veröffentlichung aus einem Branch auswählen.
-4. **main** und **/(root)** auswählen und speichern.
-5. Die von GitHub angezeigte Pages-Adresse öffnen und die Anwendung testen.
+## GitHub Pages veröffentlichen
 
-**Wichtig:** Ein veröffentlichtes GitHub-Pages-Spiel ist grundsätzlich öffentlich erreichbar. Ein privates Repository oder ein Passwort in JavaScript stellt keinen zuverlässigen Zugriffsschutz für die Webseite dar.
+1. Auf GitHub das Repository öffnen und **Settings → Pages** wählen.
+2. Unter **Build and deployment** als Quelle **Deploy from a branch** auswählen.
+3. Branch **main** und Ordner **/(root)** einstellen, anschließend **Save**.
+4. Auf die erfolgreiche Veröffentlichung warten und die von GitHub angezeigte URL öffnen.
+5. Im Smartphone-Browser Spiel, Darstellung und Installation testen.
 
-## Installation auf Mobilgeräten
+Voraussichtliche Adresse nach erfolgreicher Freischaltung: `https://techfox4711.github.io/viergewinnt-pwa/`. Sie ist **nicht als bereits aktiv bestätigt**.
 
-Diese Schritte gelten **nach** erfolgreicher Veröffentlichung und Einrichtung des PWA-Manifests.
+## Auf Android und iPhone installieren
 
-### Android
+- **Android:** veröffentlichte HTTPS-Seite im unterstützten Browser öffnen, Menü → **App installieren** oder **Zum Startbildschirm hinzufügen**.
+- **iPhone/iPad:** veröffentlichte Seite in Safari öffnen, **Teilen → Zum Home-Bildschirm** wählen.
 
-Die veröffentlichte Seite in einem kompatiblen Browser (z. B. Chrome) öffnen und im Browsermenü **App installieren** oder **Zum Startbildschirm hinzufügen** auswählen. Die genaue Bezeichnung hängt vom Browser ab.
+Nach erfolgreichem ersten Laden und Zwischenspeichern kann die PWA auch offline genutzt werden. Browser- und Betriebssystemversionen können die Installationsschritte beeinflussen.
 
-### iPhone / iPad
+## Technische Prüfungen
 
-Die veröffentlichte Seite in Safari öffnen, das Teilen-Menü aufrufen und **Zum Home-Bildschirm** wählen. Die Beschriftungen können je nach iOS-Version abweichen.
+Die JavaScript-Syntax wurde geprüft. Die KI wurde stichprobenartig mit Eröffnungs-, Gewinn- und Blockierstellungen getestet; dabei erkannte sie sofortige Gewinne sowie notwendige Blockaden korrekt. **Eine vollständige plattformübergreifende End-to-End-Prüfung steht noch aus**, insbesondere unter iOS und Android.
 
-## Tests vor der Freigabe
+## Datenschutz, Hosting und Lizenz
 
-- Vier Steine in einer waagerechten, senkrechten und diagonalen Linie erkennen.
-- Volle Spalten und ein unentschiedenes Spiel korrekt behandeln.
-- Mensch und Computer müssen abwechselnd genau einen gültigen Zug ausführen.
-- Die vier Gewinnsteine sauber und eindeutig hervorheben.
-- Touchbedienung und responsives Layout auf Android und iPhone überprüfen.
-- PWA-Installation sowie den Offline-Betrieb nach dem ersten Online-Laden testen.
-- Die Stärke und Antwortzeit der Computer-KI systematisch prüfen.
+Das Spiel benötigt kein Nutzerkonto und versendet nach dem vorliegenden Quellcode keine Spielzüge an einen eigenen Backend-Dienst. Beim Abruf einer über GitHub Pages gehosteten Seite gelten unabhängig davon die technischen Zugriffs- und Datenschutzbedingungen des Hosters.
 
-## Datenschutz und Sicherheit
-
-Die endgültigen Datenschutzeigenschaften hängen von den tatsächlich eingebundenen Skripten, Ressourcen und Diensten ab. Ziel ist eine möglichst lokal ausführbare Anwendung **ohne Benutzerkonto und ohne Verarbeitung persönlicher Spieldaten auf einem eigenen Server**. Vor der Veröffentlichung müssen mögliche externe Abhängigkeiten und die Hosting-Dienste geprüft werden.
-
-## Lizenz
-
-In diesem Repository ist zunächst **keine Open-Source-Lizenz** hinterlegt. Die öffentliche Sichtbarkeit des Quellcodes bedeutet nicht, dass Dritte ihn beliebig weiterverwenden dürfen. Vor einer Freigabe unter einer bestimmten Lizenz ist eine ausdrückliche Entscheidung erforderlich.
+Ein **öffentliches Repository** bedeutet, dass der Quellcode einsehbar ist. GitHub Pages bietet für diese Standardveröffentlichung keinen eingebauten Passwortschutz. Für den eigenen Spielcode wurde noch keine allgemeine Open-Source-Lizenz festgelegt. Hinweise zum im Paket referenzierten externen Eröffnungsbuch stehen in `VIER_GEWINNT_LIZENZEN.txt`; dessen Lizenzherkunft ist vor weiterer Weiterverbreitung abzugleichen.
 
 ---
 
-**Repository:** [techfox4711/viergewinnt-pwa](https://github.com/techfox4711/viergewinnt-pwa)
+Projekt: **techfox4711/viergewinnt-pwa**
