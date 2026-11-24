@@ -54,7 +54,7 @@
   <div class="score"><b class="yellow">● COMPUTER</b><strong id="aiScore">0</strong><span>Siege</span></div>
 </section>
 <div id="status" aria-live="polite">● Du bist am Zug</div>
-<div id="info">Mathematisch geprüftes Eröffnungsbuch · starke Suche</div>
+<div id="info">Taktische Prüfung · starke KI-Suche</div>
 <section class="game" aria-label="Vier-Gewinnt-Spielfeld">
   <div class="columns" id="colButtons"></div>
   <canvas id="board" width="728" height="628" role="button" tabindex="0" aria-label="Spielfeld mit sieben Spalten, durch Berühren einen Stein einwerfen"></canvas>
@@ -166,7 +166,7 @@ function newGame(clearScores=false){
   if(thinkingTimer!==null){clearTimeout(thinkingTimer);thinkingTimer=null;}
   if(clearScores){points=[0,0,0];score1.textContent='0';score2.textContent='0';}
   grid=Array.from({length:6},()=>Array(7).fill(0));history=[];turn=1;finished=false;falling=null;hover=null;winners=new Set();
-  setStatus('● Du bist am Zug');setInfo('Eröffnungsbuch · exakte Endspielsuche · 7 × 6');render();
+  setStatus('● Du bist am Zug');setInfo('Eröffnungsbuch · taktische Abwehr · KI-Suche · 7 × 6');render();
 }
 function drop(col,p){
   if(finished||falling||p!==turn||col<0||col>6)return;
@@ -258,7 +258,9 @@ function aiMove(){
   if(aiWins.length){setInfo('Taktik: sofortiger Gewinn erkannt');drop(aiWins[0],2);return;}
   const humanWins=immediateWinningColumns(1);
   if(humanWins.length){setInfo('Taktik: unmittelbare Gewinndrohung abgewehrt');drop(humanWins[0],2);return;}
-  const col=bookMove(history);
+  // Das bisherige Eröffnungsbuch enthält ungünstige Folgezüge. Nur die erste Antwort nutzen.
+  // Danach entscheidet die reguläre, zeitbegrenzte KI-Suche.
+  const col=history.length===1?bookMove(history):null;
   if(col!==null && safeCandidate(col)){
     setInfo('Eröffnungsbuch · Zug auf sofortige Gefahren geprüft');drop(col,2);return;
   }
