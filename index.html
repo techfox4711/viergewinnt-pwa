@@ -395,8 +395,17 @@ newGame();
 </script>
 <script>
 if ("serviceWorker" in navigator) {
+  // Installierte Apps sollen bei einer neuen Version den aktualisierten Worker übernehmen.
+  let appReloadingForUpdate = false;
+  navigator.serviceWorker.addEventListener("controllerchange", () => {
+    if (appReloadingForUpdate) return;
+    appReloadingForUpdate = true;
+    window.location.reload();
+  });
   window.addEventListener("load", () => {
-    navigator.serviceWorker.register("./sw.js").catch(err => console.warn("SW fehlgeschlagen:", err));
+    navigator.serviceWorker.register("./sw.js", { updateViaCache: "none" })
+      .then(registration => registration.update())
+      .catch(err => console.warn("SW-Aktualisierung fehlgeschlagen:", err));
   });
 }
 </script>
