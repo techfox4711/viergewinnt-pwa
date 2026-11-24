@@ -64,7 +64,7 @@
   <button class="action alt" id="resetScore">Punkte zurücksetzen</button>
 </div>
 <div class="settings"><label for="thinkTime">Maximale KI-Denkzeit:</label><select id="thinkTime"><option value="2">2 Sekunden</option><option value="5">5 Sekunden</option><option value="10">10 Sekunden</option><option value="20" selected>20 Sekunden</option></select></div>
-<footer>Originalformat 7 × 6 · Touch-Steuerung · funktioniert offline als PWA. Bei starkem Computergegner kann die Suche je nach Smartphone einige Sekunden benötigen.</footer>
+<footer>Originalformat 7 × 6 · Touch-Steuerung · funktioniert offline als PWA. Bei starkem Computergegner kann die Suche je nach Smartphone einige Sekunden benötigen.<div id="buildVersion" style="margin-top:7px;color:#91aacc">KI-Version 1.2 · 24.11.2026</div></footer>
 <div class="settings" style="margin-top:2px"><span>Installation: iPhone/iPad über <b>Safari → Teilen → Zum Home-Bildschirm</b>, Android über <b>Installieren / Zum Startbildschirm hinzufügen</b>.</span></div>
 </main>
 <script>
@@ -74,7 +74,7 @@
 // Quellen und Lizenzhinweise in VIER_GEWINNT_LIZENZEN.txt im ZIP.
 const OPENING_DATA = 'GTk6QixEIRoKNQo0CiEaOSQJCTEIaRIyEioJCQkJSQosCDIZoQEqCQoSigERqQFCvQOZAnbZARIyKgoSEgoMHBRiWQ0gKikiChEKaRI6EkoJChISKRISKTkaCQpVchISFRIJagkSEjoNKA0aQqIBCngICHx9PQ0tEhUIIiESFRoMETlCGlIhGQkJTBQIDDU6JRoJMTQKJEREDBQpJRQMKgkKEhIJCgoSHQoJDQoSCCoVDAoUCgoKCQoSCgoJCQoSEkEhCQlUWTkZCRkaKRIJESqiAbEBCQkMUj09OikxCBQNGToUCRkhGRUSOTISGjwSEhokLSkyUSIKEgkaCgoKbQkqCgoOGikSCiJUIhwkUiI6IhISFUISEgoKEhJdCQoSCgoRChQNCiJycjo8InoSHDw6EhY9IgoVGgwUIgoUCho8CQoKGhIVChIWCipMCAw8NRgdDQoNECI1MQq0ASVUKRQyIQgqFT0aJSQtLRUZFDw0DBQ0LAo8DCTUA01cFSzBAUQcPCQSECQSOg00VTUpFQ0KDRAUDCAIMrUBNg0QJTypAQ0wRQhRYtUBpAIhTSwVItIBWgoSIhwiGTk5OCINDgwaCQ0NLQgMIlI1CSUNFQ0lFRUSCiQdCDIIFRwKPT0JGhEVDQ0NEh0JHBkdMhgVFRIyHQ0KDQ0RLSENDRhZChE5TQ0tDQoSHHIKCXI9QqIBwQEaPGx9NQ0JKhUiDRANIjIQCSa6ARI8LTAdEoEBGiIaGhktPJIBKhE4IQoWDqoCCg4SDgoN0gEiOUI2cgrCASYZHg6qAYIBGgkKESkaRXlKOhp0PGg5pAF5ugES0gIagAUSIhoaEg4aLEAUIiIJEhJJGipMKRwyWRoQDQ0OEgkREgkaCmkRGhENCRoJEUQMhAJENAwRCSFSSAgIsgFKEgoKCgpqIhIKIgoKkgFyOjohFFIJChoSWCkpKhIJOTEaKgkWGRQyOQkaGQoJIgoSCRoKCgptCSoKGRohEgpCCgoiIRIJQYIBChIqIRopEqoBOiISGiISCgoSGgoKCgkSWRISEgkSEQoJWjpxOjkiGiIaEhoSEgp6KhIaEgoKMgoKKgoKEhIKRjINMgoWIhEKtAElRBQUhAEhgQFEUQkRGjoyGioJahoi1AF0LKEDiQL+ARlOPTwWHLIBDQkqDTwMLIkBEQwcGRQxNRwxOUISEQoKKAgIMAhsDDh0iAFYgQEMOG2pAUI4rAGcAQkOJAwyDjINPHIQKQkSIhoaEg4aLEAUIiIaWFEdHgkdkgEyDByKARoZEAwSUjwSEgoiEhIaEgoaMBQUCiISCjIiOjqqAZwBMjIaDEWcAQoiDBIRHQ0JEgoMDQkcIBUVDhocPVoqTCkcMpoBIWEJEQkREQySAQwUkgExCggSgQEUEgoSIgoKEhoKCQoJEjAqIkIqOjopggFaFAo6EgkSEhIKTApCEipkEhEpEgoRkgIiEhQKESoqCgocCgoSEg0KaAgMLAwMLAwaKgkKEQoKDDRgEDo0CgoKGhIKCiISMnV9DCxwUBAQQTUaGAhCEgkSCmIdDQoNDREtIQ0NGFkKETkUKgoSETghChYOugENDQ0KCBEKChIdCgkSEggSLQwKGgoKCgoSCgoNEiJCCgoSEgoiERosDDENCg0hEhFKCgoRCgkKChESIiIKCjoKEgoKCgoKGgoKUQkJCRUlHAkkCU0KEhkNEQkMDUIKCgkJCQoKChUZehIKEowBCQkJCUoSIQotDAxKKhIsChUaDQoJERkSEQkRDBEREgkRCQkJCQkKCQoJCj4NCgkNChIKIR1pIQoKNRwsDIIBGkAIejkxbTwKOn0lQoEBIQlJNQoKFRkJQiJKGREIDUQsWhIlEhIQDBoKdBQdDBIJKioKHggeOBIiGkIpCCoVPRolJC0tFRkiOjIaKglqGiIqChoSEiIKDUIaCgpFCjUKKo4DGhgISiIiOrgBGhIhHRISGnUaCglKEBIaGQgyChomLBI6GlkNDAoUCgo5DSQcFAkJDAw5MQkKCQoRCgooCAgwCGwMOEIKIhI5CAwYTKIBsQEIHAwRsQEsdAw0CSISNUQMCgodDAotDBAMGgpEDBoMCgkyCTIKCiIKCiwKCQgKFAoKLBIMDBoKCgkIKgkqDBoJChoJChIKCiEKCiUaIhQSIQoJKQoqDByKARoZEAwSUioKEhoKChoKCgoUCQoKFQoaEgpqEioUCkoZEREJCQkpDBAxMQkxCioKCgkKChIKChkKCgoaJkIyCj0iGhISCgoKGQoJCgoKVRUJFSRCDAoSEgoNChUZFhUeCQ0NDhwILAkiGnUKChISCCEdCApRCSqKAjEKCBKCAQoyChoKCgoUCQkJFQoaEgoKGjoKCkxJCQwNCREpLAwJCDEhCQl6CQoJCQkJCkoaShIJZEIMCXIaCiS6ARINCRY0DAoSIRoaCgoKCiI8ggEaLSxagAFCEhokXK0BfQwscGCKASLYARhCqAUNCBiMATRAmQEhCQlUWTkZCRmKATl1qQEJCQkVJRwJJAlNChIZMVERCUoKDRKJAXERCQkJEroBmQERCQkJXLoBLSwxGnEpEWISEhVCEhIKChISXQkKEgoKEQoUDQoKEhoiEgoKEhoKCgoJElkSEhIJEhEKCRI6MgoOEgoKegoqCgoiCqIBCiIWDbIBcgoKFA4KIiIJJhIKIgoMCSUKEmoKEg6OARYWHQoKFRJ6ChIKFnoKChIVSgk8MhJpMgk5PCoKMgkSPDCdAQwsDAkkCVEkCQgcDBEpCQk0egoaKdoCzAKsAawBOXRxyQFROcwBiAFYoQIIHAwR7AWMA9wBMbABqgEJEhIpESoKChIJagkSEhIJEiwSEgoiEhIaEgoaMBQUCiISCjIUCkoZEREJCQkpDBAxMQkxwQESwgEKMRIqChwKCkI6CioKygEp2gExOgoNEhUcNDIKCRISchkJGREKFA0KGYIBigEiCgoSGgoJCgkSMCoiQhxJCQwNCREpLAwJCDEhCQmJAYUBEboBMREqCgoUDAoiIioKCgoJajEUKgoKFCxiCjIKaRUqCQoSFhxxqgFCEgoJKQlSsgE6qgGSAQoKDREKDRISEhoaShIJEgqNATIcDgqCAQkiMpwBOjoyDKEBKh4aCRIKEXIqaioaEhEaGVIKYA0ICBUaCQkyggEiEjJqmQJiCgoJCQkKCgoVGXoSChKBAREJCQkSugGpAQnxAhEJEXAIkgEyqQEZWeoBcjo8cjpxOjmqAYICcgoKFA4KIiIJJhIKIgoMCSUKlAFykgGOAXY+PaoBqgG5BkIYCEoiIjqZATE4qQUQGTgIcMABCRkgEAhowgLSAjm6A8ICCSZKOjoqCp4E4gG6AwoyCTpyMgoyCjo6OqoBWioKCgkKChIKChkKCgoaJkIyCjoKMRIqChwKCkI6CioKxAFyogE6QpICOkI2IVIK5AFyMgqqATopggGSAQkKCQkJCQpKGkoSCWIxESoKChQMCiIiKgoKCgmpAUQ6OtkBRDJC2QFCcooCGhpNUkIYIEKRAhDVAQ0t+gRhgQMtoAG1ASLpAREJEV09PT10ZCoKHM0BDAoUHBIZGRUNCRkMERkNIhANDQoJCmQ6cZ0BuQFykgLtAZkBDg0RGbIBchIcPDoSFj0iQhYiChUSCnoNDQo1CRIKdBJBbRY9kgENpgEKDi0JDSqCBOIBfCwKLgwdGAqsAU1cFSzpAXU15QENNRUlCiUNZcIBDT0yeWk4XSXRASISCPEBVSIdDRgMHRgMDR08MRFEVVpMKhmcAawBNH0tFS0NMg1UHA0JLAoa6QMMnAEqnQE9rAE6rQEqXBoMDTo0Pg5tPA08IQ0KPUQtGhEVDQ0JEhQJCTEIKgo1RAoqCQopPQkNJQwIHQoN8QEKEoIDggJ6YRrUARFaHQkRCAkVIoUBDXoaFA4ONDYJOi0QHRYaER0NCRIKDA0JHCAVFQ4aHD0QMg0KFRkWFR4JDQ0OHAgsCSIaqgEJChISggEiCo0BQjZybXI8cGpyChJSFQw0EpkBDTIaGn0qHTglOQoyHj4kOEgtDWQKFiYJFiIKDTL4A0LIAxkSHKUBDRAQSkEaHAowCpEBCREJGTo8Hjo62gEoLMEBDQkJCQkVMjkOOhIiCjJBEYkDIekCkgEpwQESCSJCKlFcchISGTwWKRUiDA4yCjIKCgkKGhISIipKFQoSCjpKKgoKElIyCg0NEhqyAQodigEKChJSjQFKYvwBCgoSChoSERKCATISVAwKEiEaGgoKCgoiPAxsPBY1DBwRDAwsPB4pFhlOPTwWHFYmCTkWCB4uDkoWKhqqA8YB5gEiOjlhgQEZGhQICRoKDBEZCUESJgwSLBIgVjYpDQ0pFHIJPiQMMg4yDTxyEDYiCg5gQi5RCCzUAyFxMpoBSXFlbAphCjESJoQBQTpCGhQODjQ2CTotEB0WGhEdDQkSCgwNCRwgFRUOGhw9EDINChUZFhUeCQ0NDhwILAkiGqoBCQoSEoIBIgqNAUI2cm1yPHBqcgoSUhUMNBKiATIqPBIJNQkuJg6CATIOOhAtXg5KMgpKKQgsCc4GDh4O6QF+Dh5iZBoRDBw=';
 const OPENINGS = (() => {
-  const ans = new Uint8Array(7+343+16807).fill(3);
+  const ans = new Uint8Array(7+343+16807).fill(255);
   const data=atob(OPENING_DATA);let idx=-1,val=0,shift=0;
   for(let i=0;i<data.length;i++){
     let b=data.charCodeAt(i);val+=(b&127)*2**shift;
@@ -87,7 +87,8 @@ function bookMove(hist){
   const offsets={1:0,3:7,5:350}, n=hist.length;
   if(!(n in offsets))return null;
   let idx=0;for(const c of hist)idx=idx*7+c;
-  return OPENINGS[offsets[n]+idx];
+  const move=OPENINGS[offsets[n]+idx];
+  return move===255?null:move; // Ohne Eintrag die KI rechnen lassen.
 }
 const C=100, PAD=14, TOP=14, W=728, H=628;
 const RED='#f75c76',GOLD='#f4bd43';
@@ -258,9 +259,9 @@ function aiMove(){
   if(aiWins.length){setInfo('Taktik: sofortiger Gewinn erkannt');drop(aiWins[0],2);return;}
   const humanWins=immediateWinningColumns(1);
   if(humanWins.length){setInfo('Taktik: unmittelbare Gewinndrohung abgewehrt');drop(humanWins[0],2);return;}
-  // Das bisherige Eröffnungsbuch enthält ungünstige Folgezüge. Nur die erste Antwort nutzen.
-  // Danach entscheidet die reguläre, zeitbegrenzte KI-Suche.
-  const col=history.length===1?bookMove(history):null;
+  // Das Buch ist dünn besetzt: fehlende Einträge dürfen nicht die Mittelspalte erzwingen.
+  // Bei fehlendem oder gefährlichem Bucheintrag entscheidet die reguläre KI-Suche.
+  const col=bookMove(history);
   if(col!==null && safeCandidate(col)){
     setInfo('Eröffnungsbuch · Zug auf sofortige Gefahren geprüft');drop(col,2);return;
   }
