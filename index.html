@@ -215,18 +215,39 @@ function givesOpponentImmediateWin(col){
   grid[row][col]=0;
   return unsafe;
 }
+// Doppel-Drohungen: Rot schafft sich mit einem Zug zwei sofortige Gewinnmöglichkeiten.
+function permitsOpponentFork(col){
+  const row=playableRow(col);
+  if(row<0)return true;
+  grid[row][col]=2;
+  let fork=false;
+  for(let humanCol=0;humanCol<7;humanCol++){
+    const r=playableRow(humanCol);
+    if(r<0)continue;
+    grid[r][humanCol]=1;
+    const doubleThreat=immediateWinningColumns(1).length>=2;
+    const aiWins=immediateWinningColumns(2).length>0;
+    grid[r][humanCol]=0;
+    if(doubleThreat&&!aiWins){fork=true;break;}
+  }
+  grid[row][col]=0;
+  return fork;
+}
+function safeCandidate(col){
+  return playableRow(col)>=0 && !givesOpponentImmediateWin(col) && !permitsOpponentFork(col);
+}
 function verifiedAiColumn(suggestion){
-  // Eigener Gewinn hat Vorrang vor jeder Blockade.
   const wins=immediateWinningColumns(2);
-  if(wins.length)return wins[0];
-  // Einen unmittelbar drohenden Gewinnzug des Menschen stets blockieren.
+  if(wins.length)return wins[0]; // Eigener Gewinn geht vor.
   const threats=immediateWinningColumns(1);
-  if(threats.length)return threats[0];
+  if(threats.length)return threats[0]; // Akute Bedrohung blockieren.
+  if(safeCandidate(suggestion))return suggestion;
+  // Suche nach einem anderen Zug ohne direkte Niederlage oder vermeidbare Doppel-Drohung.
+  for(const col of [3,2,4,1,5,0,6])if(safeCandidate(col))return col;
   if(playableRow(suggestion)>=0&&!givesOpponentImmediateWin(suggestion))return suggestion;
-  // Ungültige oder sofort verlierende Vorschläge werden durch einen sicheren Zug ersetzt.
   for(const col of [3,2,4,1,5,0,6])
     if(playableRow(col)>=0&&!givesOpponentImmediateWin(col))return col;
-  if(playableRow(suggestion)>=0)return suggestion; // Keine sofort sichere Alternative.
+  if(playableRow(suggestion)>=0)return suggestion;
   for(const col of [3,2,4,1,5,0,6])if(playableRow(col)>=0)return col;
   return null;
 }
@@ -238,7 +259,7 @@ function aiMove(){
   const humanWins=immediateWinningColumns(1);
   if(humanWins.length){setInfo('Taktik: unmittelbare Gewinndrohung abgewehrt');drop(humanWins[0],2);return;}
   const col=bookMove(history);
-  if(col!==null && playableRow(col)>=0 && !givesOpponentImmediateWin(col)){
+  if(col!==null && safeCandidate(col)){
     setInfo('Eröffnungsbuch · Zug auf sofortige Gefahren geprüft');drop(col,2);return;
   }
   setInfo('Analyse läuft …');
