@@ -1,5 +1,5 @@
 // Offline-Funktion mit Aktualisierung von Symbolen und App-Konfiguration.
-const CACHE_NAME = "vier-gewinnt-pro-v4";
+const CACHE_NAME = "vier-gewinnt-pro-v5";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./icons/icon-192.png", "./icons/icon-512.png",
