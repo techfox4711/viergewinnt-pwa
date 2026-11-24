@@ -189,10 +189,58 @@ function afterMove(z,s,p){
   if(p===1){turn=2;setStatus('● Computer denkt …',GOLD);const id=round;thinkingTimer=setTimeout(()=>{thinkingTimer=null;if(id===round)aiMove();},290);}
   else {turn=1;setStatus('● Du bist am Zug');}
 }
+// Unabhängige Taktikprüfung: das Eröffnungsbuch darf nie einen sofortigen Verlust übersehen.
+function playableRow(col){
+  if(!Number.isInteger(col)||col<0||col>=7)return -1;
+  for(let row=5;row>=0;row--)if(!grid[row][col])return row;
+  return -1;
+}
+function immediateWinningColumns(player){
+  const result=[];
+  for(let col=0;col<7;col++){
+    const row=playableRow(col);
+    if(row<0)continue;
+    grid[row][col]=player;
+    const wins=winningLine(row,col,player).length>=4;
+    grid[row][col]=0;
+    if(wins)result.push(col);
+  }
+  return result;
+}
+function givesOpponentImmediateWin(col){
+  const row=playableRow(col);
+  if(row<0)return true;
+  grid[row][col]=2;
+  const unsafe=immediateWinningColumns(1).length>0;
+  grid[row][col]=0;
+  return unsafe;
+}
+function verifiedAiColumn(suggestion){
+  // Eigener Gewinn hat Vorrang vor jeder Blockade.
+  const wins=immediateWinningColumns(2);
+  if(wins.length)return wins[0];
+  // Einen unmittelbar drohenden Gewinnzug des Menschen stets blockieren.
+  const threats=immediateWinningColumns(1);
+  if(threats.length)return threats[0];
+  if(playableRow(suggestion)>=0&&!givesOpponentImmediateWin(suggestion))return suggestion;
+  // Ungültige oder sofort verlierende Vorschläge werden durch einen sicheren Zug ersetzt.
+  for(const col of [3,2,4,1,5,0,6])
+    if(playableRow(col)>=0&&!givesOpponentImmediateWin(col))return col;
+  if(playableRow(suggestion)>=0)return suggestion; // Keine sofort sichere Alternative.
+  for(const col of [3,2,4,1,5,0,6])if(playableRow(col)>=0)return col;
+  return null;
+}
 function aiMove(){
   if(turn!==2||finished)return;
+  // Sofortgewinne und notwendige Blockaden haben absoluten Vorrang vor Eröffnungsbuch und Suche.
+  const aiWins=immediateWinningColumns(2);
+  if(aiWins.length){setInfo('Taktik: sofortiger Gewinn erkannt');drop(aiWins[0],2);return;}
+  const humanWins=immediateWinningColumns(1);
+  if(humanWins.length){setInfo('Taktik: unmittelbare Gewinndrohung abgewehrt');drop(humanWins[0],2);return;}
   const col=bookMove(history);
-  if(col!==null && !grid[0][col]){setInfo('Geprüftes Eröffnungsbuch · mathematisch ausgewertete Antwort');drop(col,2);return;}
+  if(col!==null && playableRow(col)>=0 && !givesOpponentImmediateWin(col)){
+    setInfo('Eröffnungsbuch · Zug auf sofortige Gefahren geprüft');drop(col,2);return;
+  }
   setInfo('Analyse läuft …');
   const serial=round;
   const seconds=Number(document.getElementById('thinkTime').value);
@@ -207,16 +255,29 @@ function aiMove(){
       if(d.kind==='progress'){setInfo('Tiefe '+d.depth+' · '+d.nodes.toLocaleString('de-DE')+' Knoten');}
       else if(d.kind==='done'){
         if(worker){worker.terminate();worker=null;}
-        setInfo((d.solved?'Stellung vollständig gelöst':'Suche bis Tiefe '+d.depth)+' · '+d.nodes.toLocaleString('de-DE')+' Knoten');
-        drop(d.col,2);
+        const safeCol=verifiedAiColumn(d.col);
+        if(safeCol===null)return;
+        setInfo(safeCol!==d.col?'Sicherheitsprüfung: riskanten KI-Zug ersetzt':(d.solved?'Stellung vollständig gelöst':'Suche bis Tiefe '+d.depth)+' · '+d.nodes.toLocaleString('de-DE')+' Knoten');
+        drop(safeCol,2);
       }
-      else if(d.kind==='error'){setInfo('Berechnungsfehler: '+String(d.message).slice(0,70));if(worker){worker.terminate();worker=null;}drop(legalCenter(),2);}
+      else if(d.kind==='error'){
+        setInfo('KI-Berechnungsfehler: sicherer Ersatzzug');
+        if(worker){worker.terminate();worker=null;}
+        const safeCol=verifiedAiColumn(null);if(safeCol!==null)drop(safeCol,2);
+      }
     };
-    worker.onerror=e=>{if(serial!==round)return;setInfo('Browser blockiert den KI-Worker – Fallback-Zug');if(worker){worker.terminate();worker=null;}drop(legalCenter(),2);};
+    worker.onerror=e=>{
+      if(serial!==round)return;
+      setInfo('KI-Worker nicht verfügbar: sicherer Ersatzzug');
+      if(worker){worker.terminate();worker=null;}
+      const safeCol=verifiedAiColumn(null);if(safeCol!==null)drop(safeCol,2);
+    };
     worker.postMessage({history:history.slice(),seconds});
-  }catch(err){setInfo('KI-Worker nicht verfügbar: begrenzte Strategie');drop(legalCenter(),2);}
+  }catch(err){
+    setInfo('KI-Worker nicht verfügbar: sicherer Ersatzzug');
+    const safeCol=verifiedAiColumn(null);if(safeCol!==null)drop(safeCol,2);
+  }
 }
-function legalCenter(){for(const c of [3,2,4,1,5,0,6])if(!grid[0][c])return c;return 3;}
 function tap(col){if(turn===1&&!finished&&!falling)drop(col,1);}
 board.addEventListener('pointerdown',e=>{const rect=board.getBoundingClientRect();const x=(e.clientX-rect.left)/rect.width*W;tap(Math.floor((x-PAD)/C));});
 board.addEventListener('keydown',e=>{if('1234567'.includes(e.key) && e.key){tap(Number(e.key)-1);e.preventDefault();}});
