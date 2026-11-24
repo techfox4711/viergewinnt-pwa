@@ -1,0 +1,47 @@
+name: Generate app icons
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'icons/app-icon.svg'
+      - '.github/workflows/generate-app-icons.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  icons:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+      - name: Install SVG renderer
+        run: python -m pip install --disable-pip-version-check 'CairoSVG==2.8.2'
+      - name: Render Android, Apple and favicon PNGs
+        shell: bash
+        run: |
+          python - <<'PY'
+          import cairosvg
+          from pathlib import Path
+          source = Path('icons/app-icon.svg').read_bytes()
+          for name, size in (
+              ('icon-192.png', 192),
+              ('icon-512.png', 512),
+              ('apple-touch-icon.png', 180),
+              ('favicon-64.png', 64),
+          ):
+              cairosvg.svg2png(bytestring=source, write_to=str(Path('icons') / name), output_width=size, output_height=size)
+              print(f'Generated {name} ({size}x{size})')
+          PY
+      - name: Commit regenerated icon files
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add icons/icon-192.png icons/icon-512.png icons/apple-touch-icon.png icons/favicon-64.png
+          if ! git diff --cached --quiet; then
+            git commit -m "Regenerate PWA PNG icons from colorful SVG"
+            git push
+          fi
