@@ -1,7 +1,7 @@
-const CACHE_NAME = "vier-gewinnt-pro-v2";
+const CACHE_NAME = "vier-gewinnt-pro-v3";
 const ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
-  "./icons/icon-192.png", "./icons/icon-512.png",
+  "./icons/app-icon.svg", "./icons/icon-192.png", "./icons/icon-512.png",
   "./icons/apple-touch-icon.png", "./icons/favicon-64.png"
 ];
 self.addEventListener("install", event => {
